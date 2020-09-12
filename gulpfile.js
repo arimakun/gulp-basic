@@ -1,56 +1,42 @@
-# gulp-basic
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const sassGlob = require('gulp-sass-glob');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
+const nested = require('postcss-nesting');
+const runSequence = require('run-sequence');
+const fileinclude = require('gulp-file-include');
+const pug = require('gulp-pug');
+const ejs = require('gulp-ejs');
+const size = require('gulp-size');
+const prettify = require('gulp-html-prettify');
+const rename = require('gulp-rename');
+const del = require('del');
+const concat = require('gulp-concat');
+const uglify = require("gulp-uglify-es").default;
+const changed = require('gulp-changed');
+const ghPages = require('gulp-gh-pages');
+const plumber = require('gulp-plumber');
+const browserSync = require('browser-sync').create();
+const reload = require('browser-sync').reload();
+const spritesmith = require('gulp.spritesmith');
+const nunjucksRender = require('gulp-nunjucks-render');
 
-## install
-```sh
-$ npm init -y
-$ npm install autoprefixer browser-sync del gulp@3.9.1 gulp-changed gulp-clean-css gulp-concat gulp-ejs gulp-file-include gulp-gh-pages gulp-html-prettify gulp-imagemin gulp-nunjucks-render gulp-plumber gulp-postcss gulp-pug gulp-rename gulp-sass gulp-sass-glob gulp-size gulp-sourcemaps gulp-uglify-es gulp.spritesmith imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo postcss-nesting run-sequence --save-dev
-```
+const imagemin = require('gulp-imagemin');
+const mozjpeg = require('imagemin-mozjpeg');
+const pngquant = require('imagemin-pngquant');
+const gifsicle = require('imagemin-gifsicle');
+const svgo = require('imagemin-svgo');
 
-## folder structure
-```
-project
-│   README.md
-│   gulpfile.js
-│   .gitignore
-│   .browserlistrc
-│   .edtiorconfig
-│   .package.json
-│ 
-└─── src
-│     │
-│     └── assets
-│     │      └── fonts
-│     │      └── images
-│     │      |    └── etc...
-│     │      └── js
-│     │      |    └── plugins
-│     │      └── scss
-│     │           └── plugins
-│     └── ejs (ejs markup template)
-│     └── html (file include markup template)
-│     └── njk (nunjucks markup template)
-│     └── pug (pug markup template)
-│   
-└─── dist
-│     └── sample src folder
-│
-└─── node_modules
-```
+// onError
+const onError = (err) => {
+    console.log(err);
+};
 
-## JS, CSS Plugin
-| Plugin | README |
-| ------ | ------ |
-| jQuery | <https://jquery.com/> |
-| swiperJS | <https://swiperjs.com/> |
-| jQuery.waitforimages | <https://github.com/alexanderdickson/waitForImages> |
-| PrismJS | [plugins/onedrive/README.md][PlOd] |
-| Monthpicker | [plugins/medium/README.md][PlMe] |
-| WOW | [plugins/googleanalytics/README.md][PlGa] |
-| animate.css | [plugins/googleanalytics/README.md][PlGa] |
+// ------------------- //
 
-## task
-### scss
-```javascript
 // sass
 gulp.task('sass', () => {
     var plugins = [
@@ -70,10 +56,9 @@ gulp.task('sass', () => {
         .pipe(gulp.dest('dist/assets/css'))
         .pipe(browserSync.stream());
 });
-```
 
-### HTML - file include
-```javascript
+// ------------------- //
+
 // html : makeindex
 gulp.task('makeindex', () => {
     return gulp.src(['src/index.html'])
@@ -131,10 +116,9 @@ gulp.task('html-all', ['fileinclude', 'pug', 'ejs', 'njk'], () => {
         .pipe(gulp.dest('dist/ejs'))
         .pipe(browserSync.stream());
 });
-```
 
-### Javascript
-```javascript
+// ------------------- //
+
 // js
 gulp.task('js', () => {
     return gulp.src([ 'src/assets/js/**/*' ])
@@ -145,11 +129,10 @@ gulp.task('js', () => {
         .pipe(gulp.dest('dist/assets/js'))
         .pipe(browserSync.stream());
 });
-```
 
-### imagemin
-```javascript
-// js
+// ------------------- //
+
+// imagemin
 gulp.task('imagemin', () => {
     return gulp.src('src/assets/images/**/*')
         .pipe(plumber({ errorHandler: onError }))
@@ -164,21 +147,9 @@ gulp.task('imagemin', () => {
         .pipe(gulp.dest('dist/assets/images'))
         .pipe(browserSync.stream());
 });
-```
 
-### watch
-```javascript
-// watch
-gulp.task('watch', () => {
-    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']);
-    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html'], ['html-all']);
-    gulp.watch(['src/assets/js/**/*'], ['js']);
-    gulp.watch(['src/assets/images/**/*'], ['imagemin']);
-});
-```
+// ------------------- //
 
-### etc
-```javascript
 // clean dist
 gulp.task('clean:dist', () => {
     return del.sync(['dist/*']);
@@ -193,6 +164,18 @@ gulp.task('fonts', () => {
         .pipe(gulp.dest('dist/assets/fonts'));
 });
 
+// ------------------- //
+
+// watch
+gulp.task('watch', () => {
+    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']);
+    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html'], ['html-all']);
+    gulp.watch(['src/assets/js/**/*'], ['js']);
+    gulp.watch(['src/assets/images/**/*'], ['imagemin']);
+});
+
+// ------------------- //
+
 // browser sync
 gulp.task('server', function () {
     browserSync.init({
@@ -202,10 +185,9 @@ gulp.task('server', function () {
         }
     });
 });
-```
 
-### default, deploy, build
-```javascript
+// ------------------- //
+
 // ghPages
 gulp.task('ghPages', () => {
     return gulp.src('./dist/**/*')
@@ -226,19 +208,3 @@ gulp.task('default', (cb) => {
 gulp.task('build', (cb) => {
     return runSequence('clean:dist', ['imagemin'], ['fonts', 'html-all', 'sass', 'js'], cb);
 });
-```
-
-## run
-```sh
-$ gulp
-```
-
-## deploy
-```sh
-$ gulp deploy
-```
-
-## build
-```sh
-$ gulp build
-```

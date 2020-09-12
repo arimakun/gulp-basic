@@ -19,7 +19,7 @@ project
 └─── src
 │     │
 │     └── assets
-│     │      └── fonts
+│     │      └── fonts (use webfont)
 │     │      └── images
 │     │      |    └── etc...
 │     │      └── js
@@ -37,16 +37,30 @@ project
 └─── node_modules
 ```
 
+## SCSS Tool
+| Tool | URL |
+| ------ | ------ |
+| bourbon | <https://www.bourbon.io/> |
+
 ## JS, CSS Plugin
-| Plugin | README |
+| Plugin | URL |
 | ------ | ------ |
 | jQuery | <https://jquery.com/> |
 | swiperJS | <https://swiperjs.com/> |
 | jQuery.waitforimages | <https://github.com/alexanderdickson/waitForImages> |
-| PrismJS | [plugins/onedrive/README.md][PlOd] |
-| Monthpicker | [plugins/medium/README.md][PlMe] |
-| WOW | [plugins/googleanalytics/README.md][PlGa] |
-| animate.css | [plugins/googleanalytics/README.md][PlGa] |
+| PrismJS | <https://prismjs.com/> |
+| Monthpicker | <http://www.daterangepicker.com/> |
+| WOW | <https://wowjs.uk/> |
+| animate.css | <https://animate.style/> |
+| lazy | <http://jquery.eisbehr.de/lazy/> |
+
+## Fonts
+| Fonts | URL |
+| ------ | ------ |
+| ionicons (icon webfont) | <https://ionicons.com/v2/> |
+| XEICON (icon webfont) | <https://xpressengine.github.io/XEIcon/index.html> |
+| Noto San KR | <https://github.com/sangwoobae/noto-sans-korean-webfont> |
+| NanumGothicSquare | <https://github.com/moonspam/NanumSquare> |
 
 ## task
 ### scss
@@ -179,6 +193,11 @@ gulp.task('watch', () => {
 
 ### etc
 ```javascript
+// onError
+const onError = (err) => {
+    console.log(err);
+};
+
 // clean dist
 gulp.task('clean:dist', () => {
     return del.sync(['dist/*']);

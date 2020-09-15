@@ -63,6 +63,42 @@ project
 | NanumGothicSquare | <https://github.com/moonspam/NanumSquare> |
 
 ## task
+### Const
+```javascript
+const pkg = require("./package.json");
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const sassGlob = require('gulp-sass-glob');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
+const nested = require('postcss-nesting');
+const runSequence = require('run-sequence');
+const fileinclude = require('gulp-file-include');
+const pug = require('gulp-pug');
+const ejs = require('gulp-ejs');
+const size = require('gulp-size');
+const prettify = require('gulp-html-prettify');
+const rename = require('gulp-rename');
+const del = require('del');
+const concat = require('gulp-concat');
+const uglify = require("gulp-uglify-es").default;
+const changed = require('gulp-changed');
+const ghPages = require('gulp-gh-pages');
+const plumber = require('gulp-plumber');
+const browserSync = require('browser-sync').create();
+const reload = require('browser-sync').reload();
+const spritesmith = require('gulp.spritesmith');
+const nunjucksRender = require('gulp-nunjucks-render');
+
+const imagemin = require('gulp-imagemin');
+const mozjpeg = require('imagemin-mozjpeg');
+const pngquant = require('imagemin-pngquant');
+const gifsicle = require('imagemin-gifsicle');
+const svgo = require('imagemin-svgo');
+```
+
 ### scss
 ```javascript
 // sass
@@ -138,7 +174,21 @@ gulp.task('njk', () => {
 
 // html-all
 gulp.task('html-all', ['fileinclude', 'pug', 'ejs', 'njk'], () => {
-    return gulp.src(['dist/html/**/*', 'dist/pug/**/*', 'dist/ejs/**/*'])
+    gulp.src(['dist/html/**/*', 'dist/pug/**/*', 'dist/ejs/**/*'])
+        .pipe(plumber({ errorHandler: onError }))
+        .pipe(prettify({indent_char: ' ', indent_size: 2}))
+        .pipe(size({ gzip: true, showFiles: false }))
+        .pipe(gulp.dest('dist/html'))
+        .pipe(browserSync.stream());
+
+    gulp.src(['dist/pug/**/*'])
+        .pipe(plumber({ errorHandler: onError }))
+        .pipe(prettify({indent_char: ' ', indent_size: 2}))
+        .pipe(size({ gzip: true, showFiles: false }))
+        .pipe(gulp.dest('dist/pug'))
+        .pipe(browserSync.stream());
+
+    gulp.src(['dist/ejs/**/*'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(prettify({indent_char: ' ', indent_size: 2}))
         .pipe(size({ gzip: true, showFiles: false }))
@@ -184,8 +234,8 @@ gulp.task('imagemin', () => {
 ```javascript
 // watch
 gulp.task('watch', () => {
-    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']);
-    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html'], ['html-all']);
+    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']).on('change', browserSync.reload);
+    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html', 'src/**/_includes/**/*', 'src/_modules/**/*', '!src/_modules/**/*.scss'], ['html-all']);
     gulp.watch(['src/assets/js/**/*'], ['js']);
     gulp.watch(['src/assets/images/**/*'], ['imagemin']);
 });

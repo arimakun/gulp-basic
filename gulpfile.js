@@ -1,3 +1,4 @@
+const pkg = require("./package.json");
 const gulp = require('gulp');
 const sass = require('gulp-sass');
 const sassGlob = require('gulp-sass-glob');
@@ -70,7 +71,7 @@ gulp.task('makeindex', () => {
 
 // html : fileinclude
 gulp.task('fileinclude', () => {
-    return gulp.src(['src/html/**/*.html'])
+    return gulp.src(['src/html/**/*.html', '!src/html/_includes/*.html'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(fileinclude({ prefix: '@@', basepath: '@file' }))
         .pipe(size({ gzip: true, showFiles: false }))
@@ -79,7 +80,7 @@ gulp.task('fileinclude', () => {
 
 // html : pug
 gulp.task('pug', () => {
-    return gulp.src(['src/pug/**/*.pug'])
+    return gulp.src(['src/pug/**/*.pug', '!src/pug/_includes/*.html'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(pug())
         .pipe(rename({ extname: '.html' }))
@@ -89,7 +90,7 @@ gulp.task('pug', () => {
 
 // html : ejs
 gulp.task('ejs', () => {
-    return gulp.src(['src/ejs/**/*.html'])
+    return gulp.src(['src/ejs/**/*.html', '!src/ejs/_includes/*.html'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(ejs())
         .pipe(rename({ extname: '.html' }))
@@ -99,7 +100,7 @@ gulp.task('ejs', () => {
 
 // html : nunjucksRender
 gulp.task('njk', () => {
-    return gulp.src(['src/njk/**/*.njk'])
+    return gulp.src(['src/njk/**/*.njk', '!src/njk/_includes/*.html'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(nunjucksRender())
         .pipe(rename({ extname: '.html' }))
@@ -107,9 +108,23 @@ gulp.task('njk', () => {
         .pipe(gulp.dest('dist/njk'));
 });
 
-// html-all
+// prettify
 gulp.task('html-all', ['fileinclude', 'pug', 'ejs', 'njk'], () => {
-    return gulp.src(['dist/html/**/*', 'dist/pug/**/*', 'dist/ejs/**/*'])
+    gulp.src(['dist/html/**/*', 'dist/pug/**/*', 'dist/ejs/**/*'])
+        .pipe(plumber({ errorHandler: onError }))
+        .pipe(prettify({indent_char: ' ', indent_size: 2}))
+        .pipe(size({ gzip: true, showFiles: false }))
+        .pipe(gulp.dest('dist/html'))
+        .pipe(browserSync.stream());
+
+    gulp.src(['dist/pug/**/*'])
+        .pipe(plumber({ errorHandler: onError }))
+        .pipe(prettify({indent_char: ' ', indent_size: 2}))
+        .pipe(size({ gzip: true, showFiles: false }))
+        .pipe(gulp.dest('dist/pug'))
+        .pipe(browserSync.stream());
+
+    gulp.src(['dist/ejs/**/*'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(prettify({indent_char: ' ', indent_size: 2}))
         .pipe(size({ gzip: true, showFiles: false }))
@@ -121,7 +136,7 @@ gulp.task('html-all', ['fileinclude', 'pug', 'ejs', 'njk'], () => {
 
 // js
 gulp.task('js', () => {
-    return gulp.src([ 'src/assets/js/**/*' ])
+    return gulp.src([ 'src/assets/js/**/*', 'src/assets/js/plugins/**/*' ])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(concat('all.js'))
         .pipe(uglify())
@@ -168,8 +183,8 @@ gulp.task('fonts', () => {
 
 // watch
 gulp.task('watch', () => {
-    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']);
-    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html'], ['html-all']);
+    gulp.watch(['src/assets/scss/**/*.scss', 'src/_modules/**/*.scss'], ['sass']).on('change', browserSync.reload);
+    gulp.watch(['src/html/**/*.html', 'src/pug/**/*.pug', 'src/njk/**/*.njk', 'src/ejs/**/*.html', 'src/**/_includes/**/*', 'src/_modules/**/*', '!src/_modules/**/*.scss'], ['html-all']);
     gulp.watch(['src/assets/js/**/*'], ['js']);
     gulp.watch(['src/assets/images/**/*'], ['imagemin']);
 });

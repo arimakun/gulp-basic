@@ -174,7 +174,7 @@ gulp.task('njk', () => {
 
 // html-all
 gulp.task('html-all', ['fileinclude', 'pug', 'ejs', 'njk'], () => {
-    gulp.src(['dist/html/**/*', 'dist/pug/**/*', 'dist/ejs/**/*'])
+    gulp.src(['dist/html/**/*'])
         .pipe(plumber({ errorHandler: onError }))
         .pipe(prettify({indent_char: ' ', indent_size: 2}))
         .pipe(size({ gzip: true, showFiles: false }))

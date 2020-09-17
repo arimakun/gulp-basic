@@ -32,7 +32,7 @@ project
 │     └── pug (pug markup template)
 │   
 └─── dist
-│     └── sample src folder
+│     └── same src folder
 │
 └─── node_modules
 ```
